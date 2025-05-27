@@ -38,11 +38,6 @@ if (navigator.geolocation) {
                     );
 
                     const omerItemHariIni = data.items.find(item =>
-                        item.category === 'omer' &&
-                        item.date.startsWith(besokStr)
-                    );
-
-                    const omerItemHariIni2 = data.items.find(item =>
                         item.category === 'omer' && item.date.startsWith(hariIniStr)
                     );
 
@@ -58,13 +53,13 @@ if (navigator.geolocation) {
                         const waktuTzeit = new Date(tzeitItem.date);
 
                         if (waktuSekarang >= waktuTzeit) {
-                            omerItemTampilan = omerItemBesok || omerItemHariIni2;
+                            omerItemTampilan = omerItemBesok || omerItemHariIni;
                         } else {
                             document.getElementById("hariOmer").textContent = "Tunggu sampai setelah matahari terbenam untuk melihat hitungan Omer hari ini.";
                             return;
                         }
                     } else {
-                        omerItemTampilan = omerItemHariIni2;
+                        omerItemTampilan = omerItemHariIni;
                     }
 
                     if (omerItemTampilan) {
