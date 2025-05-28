@@ -16,66 +16,103 @@ if (navigator.geolocation) {
             const hariIniStr = saatIni.toISOString().split('T')[0];
             const besokStr = besok.toISOString().split('T')[0];
 
-            const hebcalUrl = `https://www.hebcal.com/hebcal?cfg=json&start=${hariIniStr}&end=${besokStr}&geo=pos&latitude=${lat}&longitude=${long}&m=50`;
+            fetch(`https://www.hebcal.com/zmanim?cfg=json&latitude=${lat}&longitude=${long}&date=${hariIniStr}`)
+            .then(response => {
+                if (!response.ok) throw new Error(`Hebcal Zmanim API error ${response.status}`);
+                return response.json();
+            })
+            .then(zmanimData => {
+                console.log("Data zmanim:", zmanimData);
 
-            fetch(hebcalUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Hebcal API error ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Data dari Hebcal:", data);
+                const tzeitStr = zmanimData.times?.tzeit42min || zmanimDta.times?.tzeit50min || zmanimData.times?.tzeit || null;
+                let waktuTzeit = tzeitStr ? new Date(tzeitStr) : null;
 
-                    if (!data || !Array.isArray(data.items)) {
-                        throw new Error("Data tidak valid atau items tidak tersedia");
-                    }
 
-                    const tzeitItem = data.items.find(item =>
-                        item.category === 'zmanim' &&
-                        item.title.toLowerCase().includes('tzeit')
-                    );
+                const hebcalUrl = `https://www.hebcal.com/hebcal?cfg=json&start=${hariIniStr}&end=${besokStr}&geo=pos&latitude=${lat}&longitude=${long}&m=50&maj=on&min=on&mod=on&nx=on&ss=on`;
 
-                    const omerItemHariIni = data.items.find(item =>
-                        item.category === 'omer' && item.date.startsWith(hariIniStr)
-                    );
+                fetch(hebcalUrl)
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Hebcal API error ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Data dari Hebcal:", data);
+                        console.log("Items dari API:", data.items.map(i => [i.date, i.category, i.title]));
 
-                    const omerItemBesok = data.items.find(item =>
-                        item.category === 'omer' && item.date.startsWith(besokStr)
-                    );
-
-                    const waktuSekarang = new Date();
-                    let omerItemTampilan = null;
-
-                    if (tzeitItem) {
-                        waktuTzeit = new Date(tzeitItem.date);
-
-                        if (waktuSekarang >= waktuTzeit) {
-                            omerItemTampilan = omerItemBesok || omerItemHariIni;
-                        } else {
-                            document.getElementById("hariOmer").textContent = "Tunggu sampai setelah matahari terbenam untuk melihat hitungan Omer hari ini.";
-                            return;
+                        if (!data || !Array.isArray(data.items)) {
+                            throw new Error("Data tidak valid atau items tidak tersedia");
                         }
-                    } else {
-                        omerItemTampilan = omerItemHariIni;
-                    }
 
-                    if (omerItemTampilan) {
-                        const hariAngka = omerItemTampilan.title.match(/Day (\d+)/);
-                        if (hariAngka) {
-                            document.getElementById("hariOmer").textContent = `Hari ke-${hariAngka[1]} dari Omer`;
+                        const tzeitItem = data.items.find(item =>
+                            item.category === 'zmanim' &&
+                            item.title.toLowerCase().includes('tzeit')
+                        );
+
+                        const omerItemHariIni = data.items.find(item =>
+                            item.category === 'omer' && item.date.startsWith(hariIniStr)
+                        );
+
+                        const omerItemBesok = data.items.find(item =>
+                            item.category === 'omer' && item.date.startsWith(besokStr)
+                        );
+
+                        const waktuSekarang = new Date();
+                        let omerItemTampilan = null;
+
+                        if (waktuTzeit) {
+                            if (waktuSekarang >= waktuTzeit) {
+                                omerItemTampilan = omerItemBesok || omerItemHariIni;
+                            } else {
+                                document.getElementById("hariOmer").textContent = "Tunggu sampai setelah matahari terbenam untuk melihat hitungan Omer hari ini.";
+                                return;
+                            }
                         } else {
-                            document.getElementById("hariOmer"). textContent = omerItemTampilan.title;
+                            console.warn("Waktu tzeit tidak ditemukan. Menampilkan Omer hari ini sebagai fallback.");
+                            omerItemTampilan = omerItemHariIni;
                         }
-                    } else {
-                        document.getElementById("hariOmer").textContent = "Hitungan Omer telah selesai atau belum dimulai."
-                    }
+
+                        if (omerItemTampilan) {
+                            const hariAngka = omerItemTampilan.title.match(/Day (\d+)/);
+                            if (hariAngka) {
+                                document.getElementById("hariOmer").textContent = `Hari Omer :${omerItemTampilan.hebrew} || ${omerItemTampilan.title}`;
+                            } else {
+                                document.getElementById("hariOmer").textContent = omerItemTampilan.title;
+                            }
+                        } else {
+                            document.getElementById("hariOmer").textContent = "Hitungan Omer telah selesai atau belum dimulai."
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Gagal mengambil data Omer:", error);
+                        document.getElementById("hariOmer").textContent = "Gagal mengambil data Omer.";
+                    });
                 })
                 .catch(error => {
-                    console.error("Gagal mengambil data Omer:", error);
-                    document.getElementById("hariOmer").textContent = "Gagal mengambil data Omer."
-                });
+                    console.error("Gagal mengambil data Zmanim:", error);
+
+                    const hebcalUrl = `https://www.hebcal.com/hebcal?cfg=json&start=${hariIniStr}&end=${besokStr}&geo=pos&latitude=${lat}&longitude=${long}&m=50&maj=on&min=on&mod=on&nx=on&ss=on`;
+
+                    fetch(hebcalUrl)
+                        .then(response => {
+                            if (!response.ok) throw new Error(`Hebcal API error ${response.status}`);
+                            return response.json();
+                        })
+                        .then(data => {
+                            const omerItemHariIni = data.items.find(item => 
+                                item.category === 'omer' && item.date.startsWith(hariIniStr)
+                            );
+
+                            if (omerItemHariIni) {
+                                document.getElementById("hariOmer").textContent = `Hari Omer :${omerItemTampilan.hebrew} || ${omerItemTampilan.title}`;
+                            } else {
+                                document.getElementById("hariOmer").textContent = omerItemTampilan.title;
+                            }
+                        })
+                        .catch(error => {
+                          console.error("Gagal mengambil data Omer falllback:", error);
+                          document.getElementById("hariOmer").textContent = "Gagal mengambil data Omer.";
+                        });
+                    });
             } else {
                 document.getElementById("lokasi").textContent = "Gagal membaca koordinat.";
             }
