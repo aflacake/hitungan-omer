@@ -24,7 +24,7 @@ if (navigator.geolocation) {
             .then(zmanimData => {
                 console.log("Data zmanim:", zmanimData);
 
-                const tzeitStr = zmanimData.times?.tzeit42min || zmanimDta.times?.tzeit50min || zmanimData.times?.tzeit || null;
+                const tzeitStr = zmanimData.times?.tzeit42min || zmanimData.times?.tzeit50min || zmanimData.times?.tzeit || null;
                 let waktuTzeit = tzeitStr ? new Date(tzeitStr) : null;
 
 
@@ -103,7 +103,7 @@ if (navigator.geolocation) {
                             );
 
                             if (omerItemHariIni) {
-                                document.getElementById("hariOmer").textContent = `Hari Omer :${omerItemTampilan.hebrew} || ${omerItemTampilan.title}`;
+                                document.getElementById("hariOmer").textContent = `Hari Omer :${omerItemHariIni.hebrew} || ${omerItemHariIni.title}`;
                             } else {
                                 document.getElementById("hariOmer").textContent = omerItemTampilan.title;
                             }
