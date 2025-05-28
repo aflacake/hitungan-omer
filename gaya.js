@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const styleTag = document.createElement("style");
     styleTag.textContent = `
         body {
+            padding: 0;
+            margin; 0;
             font-family: 'Lora', serif;
             line-height: 1.6;
         }
@@ -14,6 +16,38 @@ document.addEventListener('DOMContentLoaded', function() {
         #gmbrKover {
             margin: 0;
         }
+
+        #negara {
+            margin-top: -10px;
+        }
+
+        #kalenderOmer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+            .kotakHari {
+                display: flex;
+                width: 50px;
+                height: 50px;
+                padding: 10px 20px;
+                font-size: 24px;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                border: 1px solid #ccc;
+            }
+            .aktif {
+                background-color: gold;
+                font-weight: bold;
+            }
+            .lagbaomer {
+                background-color: orange;
+                color: white;
+            }
 
         .omerHitung {
             display: flex;
@@ -58,6 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(styleTag);
 
     // Konten Omer
+    document.getElementById("negara").textContent = "Hanya untuk lokasi negara Indonesia"
+
     document.getElementById("kontenOmer").textContent = "Memungkinkan bagi Anda sebagai seorang Yahudi yang taat untuk mengambil langkah kemajuan dalam perhitungan Omer digital";
 
     document.getElementById("notifPro").textContent = "Menggunakan aplikasi-web ini pada saat jam setelah matahari terbenam + beberapa menit (biasanya sekitar 40-72 menit setelah sunset), tergantung pada lokasi dan tradisi atau mengaksesnya setelah waktu 'Tzeit Hakochavim' yaitu waktu keluarnya bintang-bintang";
