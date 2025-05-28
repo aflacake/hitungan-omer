@@ -46,11 +46,10 @@ if (navigator.geolocation) {
                     );
 
                     const waktuSekarang = new Date();
-                    let waktuTzeit = null;
                     let omerItemTampilan = null;
 
                     if (tzeitItem) {
-                        const waktuTzeit = new Date(tzeitItem.date);
+                        waktuTzeit = new Date(tzeitItem.date);
 
                         if (waktuSekarang >= waktuTzeit) {
                             omerItemTampilan = omerItemBesok || omerItemHariIni;
