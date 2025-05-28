@@ -1,4 +1,28 @@
 document.addEventListener('DOMContentLoaded', function() {
+// Kalender
+function tampilkanKalenderOmer(hariAktif) {
+    const kontainer = document.getElementById("kalenderOmer");
+    kontainer.innerHTML = "";
+
+    for (let i = 1; i <= 49; i++) {
+        const kotak = document.createElement("div");
+        kotak.classList.add("kotakHari");
+        kotak.textContent = i;
+
+        if (i === 33) {
+            kotak.classList.add("lagbaomer");
+            kotak.title = "Lag BaOmer";
+        }
+
+        if (i === hariAktif) {
+            kotak.classList.add("aktif");
+        }
+        kontainer.appendChild(kotak);
+    }
+}
+
+
+
 // Meminta lokasi
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -63,8 +87,8 @@ if (navigator.geolocation) {
                             if (waktuSekarang >= waktuTzeit) {
                                 omerItemTampilan = omerItemBesok || omerItemHariIni;
                             } else {
+                                omerItemTampilan = omerItemHariIni;
                                 document.getElementById("hariOmer").textContent = "Tunggu sampai setelah matahari terbenam untuk melihat hitungan Omer hari ini.";
-                                return;
                             }
                         } else {
                             console.warn("Waktu tzeit tidak ditemukan. Menampilkan Omer hari ini sebagai fallback.");
@@ -74,12 +98,15 @@ if (navigator.geolocation) {
                         if (omerItemTampilan) {
                             const hariAngka = omerItemTampilan.title.match(/Day (\d+)/);
                             if (hariAngka) {
+                                const hariOmer = parseInt(hariAngka[1]);
                                 document.getElementById("hariOmer").textContent = `Hari Omer :${omerItemTampilan.hebrew} || ${omerItemTampilan.title}`;
+                                tampilkanKalenderOmer(hariOmer);
                             } else {
                                 document.getElementById("hariOmer").textContent = omerItemTampilan.title;
                             }
                         } else {
-                            document.getElementById("hariOmer").textContent = "Hitungan Omer telah selesai atau belum dimulai."
+                            document.getElementById("hariOmer").textContent = "Sekarang di luar periode Hitungan Omer (Pesach - Shavuot).";
+                            tampilkanKalenderOmer(0);
                         }
                     })
                     .catch(error => {
@@ -125,5 +152,4 @@ if (navigator.geolocation) {
       document.getElementById("lokasi").textContent = "Geolokasi tidak didukung di browser ini.";
       document.getElementById("hariOmer").textContent = "Tidak dapat menampilkan hari hitungan Omer tanpa lokasi";
   }
-
 });
